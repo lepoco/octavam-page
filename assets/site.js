@@ -1,4 +1,3 @@
-/* Illustrative examples of the native app; no MIDI connection is made here. */
 (function () {
   "use strict";
   var preview = document.getElementById("mode-preview");
