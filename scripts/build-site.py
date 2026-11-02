@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import hashlib
 import re
 import shutil
 import sys
@@ -239,7 +240,13 @@ def render(html, app_id, store_url, show_banner=True):
                         node.pop(key, None)
         return match[1] + "\n" + json.dumps(data, ensure_ascii=False, indent=2) + "\n" + match[3]
 
-    return re.sub(r'(<script type="application/ld\+json">)(.*?)(</script>)', schema, html, flags=re.S)
+    html = re.sub(r'(<script type="application/ld\+json">)(.*?)(</script>)', schema, html, flags=re.S)
+
+    def asset(match):
+        digest = hashlib.sha256((ROOT / match[2].lstrip("/")).read_bytes()).hexdigest()[:12]
+        return match[1] + match[2] + "?v=" + digest + match[3]
+
+    return re.sub(r'((?:href|src)=")(/assets/[^"?]+\.(?:css|js))(")', asset, html)
 
 
 def build():
